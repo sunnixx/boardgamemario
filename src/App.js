@@ -9,22 +9,21 @@ class App extends Component {
     super(props);
 
     // this.state = { bWidth: prompt("Enter board width"), bHeight: prompt("Enter board height"),boardArr: [] }
-    this.state = {bWidth: 5, bHeight: 5, boardArr: []};
+    this.state = { bWidth: 5, bHeight: 5, boardArr: [] };
 
     this.drawBoard = this.drawBoard.bind(this);
     this.spawnCharacters = this.spawnCharacters.bind(this);
     this.playerMove = this.playerMove.bind(this);
+    this.renderCharacters = this.renderCharacters.bind(this);
   }
 
   drawBoard() {
     let counter = 0;
-    for(let i = 0; i<this.state.bHeight; i++) {
-      for(let j = 0; j<this.state.bWidth; j++) {
+    for (let i = 0; i < this.state.bHeight; i++) {
+      for (let j = 0; j < this.state.bWidth; j++) {
         this.state.boardArr.push(counter++);
       }
     }
-
-    console.log(this.state.boardArr);
   }
 
   spawnCharacters() {
@@ -32,25 +31,43 @@ class App extends Component {
     let spawnGoombas = 5;
     let arrIndex = Math.floor(Math.random() * this.state.boardArr.length);
     let counter = 0;
-    
-    for(let i = 0; i<spawnGoombas; i++) {
+
+    for (let i = 0; i < spawnGoombas; i++) {
       this.state.boardArr[Math.floor(Math.random() * this.state.boardArr.length)] = 'X';
     }
 
     //Spawn player on the array for datastructure
-    if(this.state.boardArr[arrIndex] !== 'X') {
+    if (this.state.boardArr[arrIndex] !== 'X') {
       this.state.boardArr[arrIndex] = 'P';
     } else {
-      this.state.boardArr[arrIndex+1] = 'P';
+      this.state.boardArr[arrIndex + 1] = 'P';
     }
 
+  }
+
+  renderCharacters() {
+
     //Render characters on board
+    let counter = 0;
+
     for(let i = 0; i<this.state.bWidth; i++) {
       for(let j = 0; j<this.state.bHeight; j++) {
-        counter++;
-        if(this.state.boardArr[counter] === 'X' || this.state.boardArr[counter] === 'P') {
+        if(document.getElementById(`${counter}`).innerText === 'X' || document.getElementById(`${counter}`).innerText === 'P' ) {
+          document.getElementById(`${counter}`).innerText = '';
+        }
+        counter++
+      }
+    }
+
+    counter = 0;
+
+    for (let i = 0; i < this.state.bWidth; i++) {
+      for (let j = 0; j < this.state.bHeight; j++) {
+        
+        if (this.state.boardArr[counter] === 'X' || this.state.boardArr[counter] === 'P') {
           document.getElementById(`${counter}`).appendChild(document.createTextNode(this.state.boardArr[counter]))
         }
+        counter++;
       }
     }
   }
@@ -58,15 +75,16 @@ class App extends Component {
   playerMove(position) {
 
     let counter = 0;
-    
-    for(let i = 0; i<this.state.bWidth; i++) {
-      for(let j = 0; j<this.state.bHeight; j++) {
-        counter++;
-        if(this.state.boardArr[counter] === 'P') {
+
+    for (let i = 0; i < this.state.bWidth; i++) {
+      for (let j = 0; j < this.state.bHeight; j++) {
+        if (this.state.boardArr[counter] === 'P') {
           this.state.boardArr[counter + position] = 'P';
+          this.state.boardArr[counter] = counter;
           console.log(this.state.boardArr);
           return;
         }
+        counter++;
       }
     }
   }
@@ -74,9 +92,10 @@ class App extends Component {
   componentWillMount() {
     this.drawBoard();
   }
-  
+
   componentDidMount() {
     this.spawnCharacters();
+    this.renderCharacters();
   }
 
   render() {
@@ -95,15 +114,21 @@ class App extends Component {
     ArrowKeysReact.config({
       left: () => {
         this.playerMove((-1));
+        this.renderCharacters()
       },
       right: () => {
         this.playerMove(1);
+        this.renderCharacters()        
       },
       up: () => {
-        this.playerMove(this.bWidth);
+        this.playerMove(-this.state.bWidth);
+        this.renderCharacters()
+        
       },
       down: () => {
-        this.playerMove(-(this.bWidth))
+        this.playerMove(this.state.bWidth)
+        this.renderCharacters()
+        
       }
     });
 
