@@ -1,8 +1,16 @@
+/*
+  - This is a simple board game of saving the princess. 
+  - The code is created using React.js. 
+  - Feel free to fiddle around
+*/ 
+
+
 import React, { Component } from 'react';
 import ArrowKeysReact from 'arrow-keys-react';
 import './App.css';
 import goomba from './assets/img/goomba.png';
 import mario from './assets/img/mario.png';
+import { spawn } from 'child_process';
 
 class App extends Component {
   
@@ -22,6 +30,10 @@ class App extends Component {
   }
 
   drawBoard() {
+    /*
+      This function will create the data-structure of the application.
+      An array is being used for track Mario and Goombas position.
+    */
     let counter = 0;
     for (let i = 0; i < this.bHeight; i++) {
       for (let j = 0; j < this.bWidth; j++) {
@@ -31,11 +43,27 @@ class App extends Component {
   }
 
   spawnCharacters() {
-    //This method will spawn number of goombas in random locations
-    let spawnGoombas = 5;
+    /* 
+      This function will spawn the characters on the board inside the DOM.
+      The characters are being tracked from the Array that was populated in drawboard() function.
+    */
+    let spawnGoombas = 0; //The variable to control goombas spawning
+
+    if((this.bHeight * this.bWidth) < 10){
+      spawnGoombas = 4;
+    } else if((this.bHeight * this.bWidth) > 10 && (this.bHeight * this.bWidth) < 30 ) {
+      spawnGoombas = 8;
+    } else if((this.bHeight * this.bWidth) > 30 && (this.bHeight * this.bWidth) < 50) {
+      spawnGoombas = 15;
+    } else if((this.bHeight * this.bWidth) > 50) {
+      spawnGoombas = 30;
+    }
+
+    //Randomly select locations for spawning them
     let arrIndex = Math.floor(Math.random() * this.boardArr.length);
 
     for (let i = 0; i < spawnGoombas; i++) {
+      //The data structure of handling goomba spawns
       this.boardArr[Math.floor(Math.random() * this.boardArr.length)] = 'X';
     }
 
@@ -50,13 +78,17 @@ class App extends Component {
 
   renderCharacters() {
 
-    //Render characters on board
+    /*
+      - Spawn characters on the board.
+      - The function adds HTML elements of images based on the location of the Array.
+    */
+    
     let counter = 0;
 
     for (let i = 0; i < this.bWidth; i++) {
       for (let j = 0; j < this.bHeight; j++) {
 
-
+        //By default the board is first cleared off.
         if (document.getElementById(`${counter}`).hasChildNodes()) {
           document.getElementById(`${counter}`).removeChild(document.getElementById(`${counter}`).firstChild);
         }
@@ -66,6 +98,7 @@ class App extends Component {
 
     counter = 0;
 
+    //The logic below renders the characters on the board
     for (let i = 0; i < this.bWidth; i++) {
       for (let j = 0; j < this.bHeight; j++) {
 
@@ -87,14 +120,16 @@ class App extends Component {
 
   playerMove(position) {
 
+    //The function that handles the player movements
     let counter = 0;
     this.moves++;
 
     let maxWidth = this.boardArr.length - 1;
-  
+    
     for (let i = 0; i < this.bWidth; i++) {
       for (let j = 0; j < this.bHeight; j++) {
         if (this.boardArr[counter] === 'P') {
+          //Player movements are handled based on the Array location of the board.
           if ((counter + position) <= maxWidth && (counter + position) >= 0) {
             this.boardArr[counter + position] = 'P';
             this.boardArr[counter] = counter;
@@ -109,6 +144,8 @@ class App extends Component {
   }
 
   win() {
+    //The function that checks if the player has won the game
+    //The function checks for 'X' in the Array, and then it doesn't find any 'X' means the player has won the game
     let counter = 0;
     let Xcounter = 0;
     for (let i = 0; i < this.bHeight; i++) {
@@ -134,6 +171,8 @@ class App extends Component {
   }
 
   render() {
+
+    //The logic below draws the cells of the table.
     let rows = [];
     let counter = 0;
     for (let i = 0; i < this.bHeight; i++) {
